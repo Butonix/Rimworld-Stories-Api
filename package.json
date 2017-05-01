@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-	"build": "node-sass views/css/main.scss views/css/main.min.css --output-style compressed",
+    "build": "node-sass views/css/main.scss views/css/main.min.css --output-style compressed",
     "start": "node server.js",
     "test": "mocha"
   },
@@ -13,7 +13,8 @@
   "dependencies": {
     "body-parser": "^1.17.1",
     "express": "^4.15.2",
-    "mongoose": "^4.9.7"
+    "mongoose": "^4.9.7",
+    "morgan": "^1.8.1"
   },
   "devDependencies": {
     "chai": "^3.5.0",
