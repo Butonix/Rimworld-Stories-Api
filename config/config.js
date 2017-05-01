@@ -11,3 +11,5 @@ exports.FACEBOOKAUTH = {
         'clientSecret'  : process.env.FB_CLIENT_SECRET, // your App Secret
         'callbackURL'   : process.env.FB_CALLBACK_URL
     };
+
+exports.CLIENT_URL = 'https://fathomless-chamber-86254.herokuapp.com';
