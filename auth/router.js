@@ -98,12 +98,19 @@ router.get('/logout', (req, res) => {
 
 // GET USER
 router.get('/get-user', (req, res) => {
-    console.log('req.user when mounting component from AJAX:');
-    console.log(req.user);
+    if (req.user) {
+        console.log('Current user: ' + req.user.username);
+    } else {
+        console.log('Not logged in');
+    }
 
     if (req.isAuthenticated()) {
         res.json({
-            message: 'LOGGED IN :D',
+            alert: {
+                message: 'Logged in as ' + req.user.username,
+                timer: 5,
+                type: 'alert-message'
+            },
             currentUser: {
                 id: req.user.id,
                 userName: req.user.username,
@@ -112,7 +119,11 @@ router.get('/get-user', (req, res) => {
         });
     } else {
         res.json({
-            message: 'NOT LOGGED IN :(',
+            alert: {
+                message: 'Not logged in',
+                timer: 5,
+                type: 'error-message'
+            },
             currentUser: {
                 id: null,
                 userName: null,
@@ -127,8 +138,6 @@ router.get('/facebook', passport.authenticate('facebook', { scope : ['email'] })
 
 // FB CALLBACK
 router.get('/facebook/callback', passport.authenticate('facebook', { scope : ['email'] }), ensureLogin, (req, res) => {
-    console.log('req.user right after FB callback:');
-    console.log(req.user);
     res.redirect(CLIENT_URL + '/profile/' + req.user._id);
 });
 

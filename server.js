@@ -7,9 +7,10 @@ const jsonParser = require('body-parser').json();
 const urlEncoded = require('body-parser').urlencoded({ extended: true });
 const session = (require('express-session')({
     secret: 'whatever floats your boat',
-    resave: false, saveUninitialized: false,
+    resave: false,
+    saveUninitialized: false,
     cookie: {
-        maxAge: 50000
+        maxAge: 1000 * 60 * 60 * 24 * 7
     }
 }));
 const mongoose = require('mongoose');
@@ -30,15 +31,16 @@ if (fs.existsSync('./config/local')) {
     loadConfig('./config/config.js');
 }
 function loadConfig (configPath) {
-    return {PORT, DATABASE_URL} = require(configPath);
+    return {PORT, DATABASE_URL, CLIENT_URL} = require(configPath);
 }
 
 const app = express();
 
 // Enable CORS
 app.use((req, res, next) => {
-	res.header("Access-Control-Allow-Origin", "*");
+	res.header("Access-Control-Allow-Origin", CLIENT_URL);
 	res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+	res.header("Access-Control-Allow-Credentials", true);
 	next();
 });
 
