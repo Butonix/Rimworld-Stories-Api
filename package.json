@@ -4,7 +4,9 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+	"build": "node-sass views/css/main.scss views/css/main.min.css --output-style compressed",
+    "start": "node server.js",
+    "test": "mocha"
   },
   "author": "",
   "license": "ISC",
@@ -16,6 +18,8 @@
   "devDependencies": {
     "chai": "^3.5.0",
     "chai-http": "^3.0.0",
-    "mocha": "^3.3.0"
+    "faker": "^4.1.0",
+    "mocha": "^3.3.0",
+    "node-sass": "^4.5.2"
   }
 }
