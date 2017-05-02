@@ -12,4 +12,4 @@ exports.FACEBOOKAUTH = {
         'callbackURL'   : process.env.FB_CALLBACK_URL
     };
 
-exports.CLIENT_URL = 'https://fathomless-chamber-86254.herokuapp.com';
+exports.CLIENT_URL = 'https://rimworld-stories.netlify.com';

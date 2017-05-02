@@ -19,6 +19,7 @@ const fs = require('fs');
 const {checkLogin} = require('./utils');
 
 const {router: authRouter} = require('./auth');
+const {router: profileRouter} = require('./profile');
 
 let server;
 mongoose.Promise = global.Promise;
@@ -54,6 +55,7 @@ app.use(passport.initialize());
 app.use(passport.session());
 
 app.use('/auth/', authRouter);
+app.use('/profile/', profileRouter);
 
 app.use('*', (req, res) => {
     return res.status(404).json({message: '404 - Not Found'});
