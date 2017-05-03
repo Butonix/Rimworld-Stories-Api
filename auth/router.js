@@ -91,9 +91,15 @@ passport.deserializeUser(function(id, cb) {
 });
 
 // LOG OUT
-router.get('/logout', (req, res) => {
+router.get('/log-out', (req, res) => {
     req.logout();
-    res.redirect(CLIENT_URL);
+    res.json({
+        currentUser: {
+            id: null,
+            userName: null,
+            email: null
+        }
+    });
 });
 
 // GET USER
