@@ -106,11 +106,6 @@ router.get('/get-user', (req, res) => {
 
     if (req.isAuthenticated()) {
         res.json({
-            alert: {
-                message: 'Logged in as ' + req.user.username,
-                timer: 5,
-                type: 'alert-message'
-            },
             currentUser: {
                 id: req.user.id,
                 userName: req.user.username,
@@ -119,11 +114,6 @@ router.get('/get-user', (req, res) => {
         });
     } else {
         res.json({
-            alert: {
-                message: 'Not logged in',
-                timer: 5,
-                type: 'error-message'
-            },
             currentUser: {
                 id: null,
                 userName: null,

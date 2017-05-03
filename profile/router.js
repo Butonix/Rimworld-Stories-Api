@@ -23,9 +23,8 @@ router.get('/get/:id', (req, res) => {
         .findById(req.params.id)
         .then(user => res.json(user))
         .catch(err => {
-            console.error(err);
             res.status(500).json({
-                alert: { message: 'Error: ' + err, timer: 10, type: 'error-message' }
+                alert: { message: 'Error when fetching user profile: ' + err, timer: 10, type: 'error-message' }
             });
         });
 });
