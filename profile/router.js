@@ -4,6 +4,15 @@ const {User} = require('../config/models');
 const router = express.Router();
 const fs = require('fs');
 const {ensureLogin} = require('../utils');
+const cloudinary = require('cloudinary');
+var multer  = require('multer')
+var upload = multer({ dest: 'uploads/' })
+
+cloudinary.config({
+  cloud_name: 'zeropointtwo',
+  api_key: '891646445961772',
+  api_secret: 'CCGtenMr5mPVCisHOegA7PG-dDM'
+});
 
 // Load either local config or regular config
 if (fs.existsSync('./config/local')) {
@@ -24,9 +33,29 @@ router.get('/get/:id', (req, res) => {
         .catch(err => {res.json({APIerror: 'Error when fetching user profile: ' + err})});
 });
 
+// UPLOAD AVATAR
+router.post('/upload-avatar', upload.single('file'), (req, res, next) => {
+    cloudinary.v2.uploader.upload(req.file.destination + req.file.filename, {
+        folder: 'avatars',
+        transformation: [
+          {width: 400, height: 400, gravity: "face", crop: "crop"},
+          {width: 200, crop: "scale"}
+        ]},
+        (err, result) => {
+        User
+            .findOneAndUpdate({_id: req.body.user}, {avatarUrl: result.secure_url})
+            .catch(err => {res.json({APIerror: 'Error when saving new avatar to DB: ' + err})});
+        return result
+        })
+        .then((result) => res.json({
+            currentUser: {avatarUrl: result.secure_url},
+            APImessage: 'New avatar successfully uploaded!'
+        }))
+        .catch(err => {res.json({APIerror: 'Error when trying to upload image: ' + err})});
+})
+
 // CHANGE USERNAME
 router.post('/change-username', (req, res) => {
-    console.log(req.body);
     return User
         .findOne({username: req.body.username})
         .then(user => {

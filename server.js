@@ -46,6 +46,7 @@ app.use((req, res, next) => {
 });
 
 app.use(morgan('common'));
+app.use(bodyParser.urlencoded({extended: true}));
 app.use(cookieParser);
 app.use(jsonParser);
 app.use(urlEncoded);
