@@ -51,9 +51,10 @@ passport.use(new FacebookStrategy({
     clientID: FACEBOOKAUTH.clientID,
     clientSecret: FACEBOOKAUTH.clientSecret,
     callbackURL: FACEBOOKAUTH.callbackURL,
-    profileFields: ["emails", "displayName"]
+    profileFields: ["emails", "displayName", 'photos']
   },
   function(accessToken, refreshToken, profile, cb) {
+      console.log(profile.photos[0].value)
     let user;
     User
     .findOne({ 'facebook.id': profile.id })
@@ -67,6 +68,7 @@ passport.use(new FacebookStrategy({
                 authType: 'facebook',
                 password: faker.internet.password(),
                 email: profile.emails[0].value,
+                avatarUrl: profile.photos[0].value,
                 facebook: {
                     id: profile.id,
                     token: accessToken
@@ -116,7 +118,8 @@ router.get('/get-user', (req, res) => {
             currentUser: {
                 id: req.user.id,
                 userName: req.user.username,
-                email: req.user.email
+                email: req.user.email,
+                avatarUrl: req.user.avatarUrl
             }
         });
     } else {
