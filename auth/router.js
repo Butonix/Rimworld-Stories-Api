@@ -98,7 +98,8 @@ router.get('/log-out', (req, res) => {
             id: null,
             userName: null,
             email: null
-        }
+        },
+        APImessage: 'You are now logged out'
     });
 });
 
