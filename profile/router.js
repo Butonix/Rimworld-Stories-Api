@@ -30,7 +30,7 @@ router.get('/get/:id', (req, res) => {
 });
 
 // UPLOAD AVATAR
-router.post('/upload-avatar', upload.single('file'), (req, res, next) => {
+router.post('/upload-avatar', upload.single('file'), ensureLogin, (req, res, next) => {
     cloudinary.v2.uploader.upload(req.file.destination + req.file.filename, {
         public_id: 'avatars/' + req.user._id,
         transformation: [
