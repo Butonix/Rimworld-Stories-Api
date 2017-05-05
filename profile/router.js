@@ -41,10 +41,10 @@ router.post('/upload-avatar', upload.single('file'), ensureLogin, (req, res, nex
         User
             .findOneAndUpdate({_id: req.user._id}, {avatarUrl: result.secure_url})
             .catch((err) => {
-                fs.unlink(req.file.destination + req.file.filename, console.log('Temp file successfully deleted: ' + req.file.destination + req.file.filename));
+                //fs.unlink(req.file.destination + req.file.filename, console.log('Temp file successfully deleted: ' + req.file.destination + req.file.filename));
                 res.json({APIerror: 'Error when saving new avatar to DB: ' + err});
             });
-        fs.unlink(req.file.destination + req.file.filename, console.log('Temp file successfully deleted: ' + req.file.destination + req.file.filename));
+        //fs.unlink(req.file.destination + req.file.filename, console.log('Temp file successfully deleted: ' + req.file.destination + req.file.filename));
         return result
         })
         .then((result) => res.json({
