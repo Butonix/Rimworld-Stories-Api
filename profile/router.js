@@ -6,13 +6,7 @@ const fs = require('fs');
 const {ensureLogin} = require('../utils');
 const cloudinary = require('cloudinary');
 var multer  = require('multer')
-var upload = multer({ dest: 'uploads/' })
-
-cloudinary.config({
-  cloud_name: 'zeropointtwo',
-  api_key: '891646445961772',
-  api_secret: 'CCGtenMr5mPVCisHOegA7PG-dDM'
-});
+var upload = multer({ dest: 'temp-uploads/' })
 
 // Load either local config or regular config
 if (fs.existsSync('./config/local')) {
@@ -22,8 +16,10 @@ if (fs.existsSync('./config/local')) {
     loadConfig('../config/config.js');
 }
 function loadConfig (configPath) {
-    return {FACEBOOKAUTH, CLIENT_URL} = require(configPath);
+    return {FACEBOOKAUTH, CLIENT_URL, CLOUDINARY_API} = require(configPath);
 }
+
+cloudinary.config(CLOUDINARY_API);
 
 // GET PROFILE
 router.get('/get/:id', (req, res) => {
@@ -34,17 +30,21 @@ router.get('/get/:id', (req, res) => {
 });
 
 // UPLOAD AVATAR
-router.post('/upload-avatar', upload.single('file'), (req, res, next) => {
+router.post('/upload-avatar', upload.single('file'), ensureLogin, (req, res, next) => {
     cloudinary.v2.uploader.upload(req.file.destination + req.file.filename, {
-        folder: 'avatars',
+        public_id: 'avatars/' + req.user._id,
         transformation: [
           {width: 400, height: 400, gravity: "face", crop: "crop"},
           {width: 200, crop: "scale"}
         ]},
         (err, result) => {
         User
-            .findOneAndUpdate({_id: req.body.user}, {avatarUrl: result.secure_url})
-            .catch(err => {res.json({APIerror: 'Error when saving new avatar to DB: ' + err})});
+            .findOneAndUpdate({_id: req.user._id}, {avatarUrl: result.secure_url})
+            .catch((err) => {
+                fs.unlink(req.file.destination + req.file.filename, console.log('Temp file successfully deleted'));
+                res.json({APIerror: 'Error when saving new avatar to DB: ' + err});
+            });
+        fs.unlink(req.file.destination + req.file.filename, console.log('Temp file successfully deleted'));
         return result
         })
         .then((result) => res.json({
@@ -55,17 +55,24 @@ router.post('/upload-avatar', upload.single('file'), (req, res, next) => {
 })
 
 // CHANGE USERNAME
-router.post('/change-username', (req, res) => {
+router.post('/change-username', ensureLogin, (req, res) => {
+    username = req.body.username.trim();
+    if (username.length < 3 || username.length > 15) {
+        return res.json({APIerror: 'Your username should contain between 3 and 15 characters'})
+    }
+    if (typeof username !== 'string') {
+        return res.json({APIerror: 'Incorrect type'})
+    }
     return User
-        .findOne({username: req.body.username})
+        .findOne({username: username})
         .then(user => {
             if (user) {
                 res.json({APIerror: 'This username is already taken, please choose another one'})
             } else {
                 return User
-                    .findOneAndUpdate({username: req.body.username})
+                    .findOneAndUpdate({username: username})
                     .then(() => res.json({
-                        currentUser: {userName: req.body.username},
+                        currentUser: {userName: username},
                         APImessage: 'User name successfully changed!'
                     }))
             }

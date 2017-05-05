@@ -1,8 +1,13 @@
+const fs = require('fs');
+
 const ensureLogin = (req, res, next) => {
     if (req.isAuthenticated() && !req.user.banned) {
         next();
     } else {
-        res.redirect(CLIENT_URL + '/auth/login');
+        if (req.file) {
+            fs.unlink(req.file.destination + req.file.filename, console.log('Temp file successfully deleted'));
+        }
+        res.json({APIerror: 'Please log in first'});
     }
 };
 
