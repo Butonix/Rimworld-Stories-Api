@@ -19,7 +19,12 @@ function loadConfig (configPath) {
     return {FACEBOOKAUTH, CLIENT_URL, CLOUDINARY_API} = require(configPath);
 }
 
-cloudinary.config(CLOUDINARY_API);
+//cloudinary.config(CLOUDINARY_API);
+cloudinary.config({
+  cloud_name: 'zeropointtwo',
+   api_key: '891646445961772',
+   api_secret: 'CCGtenMr5mPVCisHOegA7PG-dDM'
+ });
 
 // GET PROFILE
 router.get('/get/:id', (req, res) => {
@@ -30,16 +35,16 @@ router.get('/get/:id', (req, res) => {
 });
 
 // UPLOAD AVATAR
-router.post('/upload-avatar', upload.single('file'), (req, res, next) => {
+router.post('/upload-avatar', upload.single('file'), ensureLogin, (req, res, next) => {
     cloudinary.v2.uploader.upload(req.file.destination + req.file.filename, {
-        public_id: 'avatars/' + req.body.user,
+        public_id: 'avatars/' + req.user._id,
         transformation: [
           {width: 400, height: 400, gravity: "face", crop: "crop"},
           {width: 200, crop: "scale"}
         ]},
         (err, result) => {
         User
-            .findOneAndUpdate({_id: req.body.user}, {avatarUrl: result.secure_url})
+            .findOneAndUpdate({_id: req.user._id}, {avatarUrl: result.secure_url})
             .catch((err) => {
                 fs.unlink(req.file.destination + req.file.filename, console.log('Temp file successfully deleted: ' + req.file.destination + req.file.filename));
                 res.json({APIerror: 'Error when saving new avatar to DB: ' + err});
