@@ -5,7 +5,7 @@ const ensureLogin = (req, res, next) => {
         next();
     } else {
         if (req.file) {
-            fs.unlink(req.file.destination + req.file.filename, console.log('Temp file successfully deleted'));
+            fs.unlink(req.file.destination + req.file.filename, console.log('Temp file successfully deleted: ' + req.file.destination + req.file.filename));
         }
         res.json({APIerror: 'Please log in first'});
     }
