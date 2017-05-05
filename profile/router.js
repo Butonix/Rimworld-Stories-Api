@@ -19,12 +19,7 @@ function loadConfig (configPath) {
     return {FACEBOOKAUTH, CLIENT_URL, CLOUDINARY_API} = require(configPath);
 }
 
-//cloudinary.config(CLOUDINARY_API);
-cloudinary.config({
-  cloud_name: 'zeropointtwo',
-   api_key: '891646445961772',
-   api_secret: 'CCGtenMr5mPVCisHOegA7PG-dDM'
- });
+cloudinary.config(CLOUDINARY_API);
 
 // GET PROFILE
 router.get('/get/:id', (req, res) => {
