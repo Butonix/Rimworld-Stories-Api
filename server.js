@@ -10,13 +10,12 @@ const session = (require('express-session')({
     resave: false,
     saveUninitialized: false,
     cookie: {
-        maxAge: 1000 * 60 * 60 * 24 * 7
+        maxAge: 10 * 365 * 24 * 60 * 60 * 1000
     }
 }));
 const mongoose = require('mongoose');
 const morgan = require('morgan');
 const fs = require('fs');
-const {checkLogin} = require('./utils');
 
 // Load either local config or regular config
 if (fs.existsSync('./config/local')) {
@@ -26,7 +25,7 @@ if (fs.existsSync('./config/local')) {
     loadConfig('./config/config.js');
 }
 function loadConfig (configPath) {
-    return {PORT, DATABASE_URL, CLIENT_URL} = require(configPath);
+    return {PORT, DATABASE_URL, CLIENT_URL, FACEBOOKAUTH, CLOUDINARY_API} = require(configPath);
 }
 
 const {router: authRouter} = require('./auth');
@@ -104,4 +103,4 @@ if (require.main === module) {
     runServer().catch(err => console.error(err));
 }
 
-module.exports = {app, runServer, closeServer, PORT, DATABASE_URL, CLIENT_URL, FACEBOOKAUTH};
+module.exports = {app, runServer, closeServer};

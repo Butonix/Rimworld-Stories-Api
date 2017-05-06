@@ -8,17 +8,6 @@ const faker = require('faker');
 const fs = require('fs');
 const {ensureLogin} = require('../utils');
 
-// Load either local config or regular config
-if (fs.existsSync('./config/local')) {
-    console.log('Loading local FB config');
-    loadConfig('../config/local/config.js');
-} else {
-    loadConfig('../config/config.js');
-}
-function loadConfig (configPath) {
-    return {FACEBOOKAUTH, CLIENT_URL} = require(configPath);
-}
-
 // DEFINE AUTH STRATEGY
 passport.use(new LocalStrategy({
     usernameField: 'email',

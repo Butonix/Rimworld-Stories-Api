@@ -8,17 +8,6 @@ const cloudinary = require('cloudinary');
 var multer  = require('multer');
 var upload = multer({ dest: 'temp-uploads/' });
 
-// Load either local config or regular config
-if (fs.existsSync('./config/local')) {
-    console.log('Loading local FB config');
-    loadConfig('../config/local/config.js');
-} else {
-    loadConfig('../config/config.js');
-}
-function loadConfig (configPath) {
-    return {FACEBOOKAUTH, CLIENT_URL, CLOUDINARY_API} = require(configPath);
-}
-
 cloudinary.config(CLOUDINARY_API);
 
 // GET PROFILE
