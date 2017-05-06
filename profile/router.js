@@ -29,7 +29,7 @@ router.get('/get/:id', (req, res) => {
             if (req.user && req.user.id === req.params.id) {
                 res.json(user.myProfileRep())
             } else {
-                res.json(user.otherProfileRep())                
+                res.json(user.otherProfileRep())
             }
         })
         .catch(err => {res.json({APIerror: 'Error when fetching user profile: ' + err})});
@@ -78,7 +78,7 @@ router.post('/change-username', ensureLogin, (req, res) => {
                 return User
                     .findOneAndUpdate({username: username})
                     .then(() => res.json({
-                        currentUser: {userName: username},
+                        currentUser: {username: username},
                         APImessage: 'User name successfully changed!'
                     }))
             }

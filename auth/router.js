@@ -94,7 +94,10 @@ passport.deserializeUser(function(id, cb) {
 // LOG OUT
 router.get('/log-out', (req, res) => {
     req.logout();
-    res.json({ APImessage: 'You are now logged out' });
+    res.json({
+        APImessage: 'You are now logged out',
+        redirect: '/'
+     });
 });
 
 // GET USER
@@ -112,6 +115,19 @@ router.get('/get-user', (req, res) => {
     } else {
         res.json({isLoggedIn: false});
     }
+});
+
+// ENSURE LOGIN
+router.get('/ensure-login', ensureLogin, (req, res) => {
+    res.json({
+        isLoggedIn: true,
+        currentUser: {
+            id: req.user._id,
+            username: req.user.username,
+            email: req.user.email,
+            avatarUrl: req.user.avatarUrl
+        }
+    });
 });
 
 // LOGIN WITH FB
