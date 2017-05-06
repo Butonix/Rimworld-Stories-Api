@@ -54,7 +54,6 @@ passport.use(new FacebookStrategy({
     profileFields: ["emails", "displayName", 'photos']
   },
   function(accessToken, refreshToken, profile, cb) {
-      console.log(profile.photos[0].value)
     let user;
     User
     .findOne({ 'facebook.id': profile.id })
@@ -95,41 +94,23 @@ passport.deserializeUser(function(id, cb) {
 // LOG OUT
 router.get('/log-out', (req, res) => {
     req.logout();
-    res.json({
-        currentUser: {
-            id: null,
-            userName: null,
-            email: null
-        },
-        APImessage: 'You are now logged out'
-    });
+    res.json({ APImessage: 'You are now logged out' });
 });
 
 // GET USER
 router.get('/get-user', (req, res) => {
-    if (req.user) {
-        console.log('Current user: ' + req.user.username);
-    } else {
-        console.log('Not logged in');
-    }
-
     if (req.isAuthenticated()) {
         res.json({
+            isLoggedIn: true,
             currentUser: {
-                id: req.user.id,
-                userName: req.user.username,
+                id: req.user._id,
+                username: req.user.username,
                 email: req.user.email,
                 avatarUrl: req.user.avatarUrl
             }
         });
     } else {
-        res.json({
-            currentUser: {
-                id: null,
-                userName: null,
-                email: null
-            }
-        });
+        res.json({isLoggedIn: false});
     }
 });
 

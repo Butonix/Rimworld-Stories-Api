@@ -16,27 +16,23 @@ const UserSchema = mongoose.Schema({
         token: {type: String}
     }
 });
-/*
-UserSchema.methods.apiRepr = function() {
+
+UserSchema.methods.myProfileRep = function() {
     return {
         username: this.username || '',
         email: this.email || '',
-        password: this.password || '',
         id: this._id,
-        FBId: this.facebook.id || '',
-        FBToken: this.facebook.token || '',
-        authType: this.authType || '',
-        rating: this.rating || ''
+        avatarUrl: this.avatarUrl || ''
     };
 };
 
-UserSchema.methods.validatePassword = function(password) {
-    return bcrypt.compare(password, this.password);
+UserSchema.methods.otherProfileRep = function() {
+    return {
+        username: this.username || '',
+        id: this._id,
+        avatarUrl: this.avatarUrl || ''
+    };
 };
-
-UserSchema.statics.hashPassword = function(password) {
-    return bcrypt.hash(password, 10);
-};*/
 
 // STORY SCHEMA
 const StorySchema = mongoose.Schema({

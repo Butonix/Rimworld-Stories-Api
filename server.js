@@ -18,12 +18,6 @@ const morgan = require('morgan');
 const fs = require('fs');
 const {checkLogin} = require('./utils');
 
-const {router: authRouter} = require('./auth');
-const {router: profileRouter} = require('./profile');
-
-let server;
-mongoose.Promise = global.Promise;
-
 // Load either local config or regular config
 if (fs.existsSync('./config/local')) {
     console.log('Loading local config');
@@ -34,6 +28,12 @@ if (fs.existsSync('./config/local')) {
 function loadConfig (configPath) {
     return {PORT, DATABASE_URL, CLIENT_URL} = require(configPath);
 }
+
+const {router: authRouter} = require('./auth');
+const {router: profileRouter} = require('./profile');
+
+let server;
+mongoose.Promise = global.Promise;
 
 const app = express();
 
@@ -104,4 +104,4 @@ if (require.main === module) {
     runServer().catch(err => console.error(err));
 }
 
-module.exports = {app, runServer, closeServer};
+module.exports = {app, runServer, closeServer, PORT, DATABASE_URL, CLIENT_URL, FACEBOOKAUTH};

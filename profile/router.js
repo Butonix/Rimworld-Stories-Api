@@ -5,8 +5,8 @@ const router = express.Router();
 const fs = require('fs');
 const {ensureLogin} = require('../utils');
 const cloudinary = require('cloudinary');
-var multer  = require('multer')
-var upload = multer({ dest: 'temp-uploads/' })
+var multer  = require('multer');
+var upload = multer({ dest: 'temp-uploads/' });
 
 // Load either local config or regular config
 if (fs.existsSync('./config/local')) {
@@ -25,7 +25,13 @@ cloudinary.config(CLOUDINARY_API);
 router.get('/get/:id', (req, res) => {
     return User
         .findById(req.params.id)
-        .then(user => res.json(user))
+        .then((user) => {
+            if (req.user && req.user.id === req.params.id) {
+                res.json(user.myProfileRep())
+            } else {
+                res.json(user.otherProfileRep())                
+            }
+        })
         .catch(err => {res.json({APIerror: 'Error when fetching user profile: ' + err})});
 });
 
