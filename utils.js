@@ -1,4 +1,5 @@
 const fs = require('fs');
+const {User, Story} = require('./config/models');
 
 const ensureLogin = (req, res, next) => {
     if (req.user && req.isAuthenticated() && !req.user.banned) {
@@ -14,4 +15,31 @@ const ensureLogin = (req, res, next) => {
     }
 };
 
-module.exports = {ensureLogin};
+const loadUser = (req, res) => {
+    Story
+        .find()
+        .where('author').equals(req.user._id)
+        .then((stories) => {
+            let latestDraft = null;
+            // get latest draft
+            stories.forEach((story) => {
+                latestDraft =
+                (latestDraft && story.datePosted.getTime() > latestDraft.datePosted && story.status === 'draft') ||
+                (latestDraft === null && story.status === 'draft')
+                ? story : latestDraft;
+            })
+            res.json({
+                isLoggedIn: true,
+                currentUser: {
+                    id: req.user._id,
+                    username: req.user.username,
+                    email: req.user.email,
+                    avatarUrl: req.user.avatarUrl,
+                    stories: stories,
+                    currentDraft: latestDraft
+                }
+            });
+        })
+}
+
+module.exports = {ensureLogin, loadUser};

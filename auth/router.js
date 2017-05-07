@@ -2,11 +2,11 @@ const express = require('express');
 const passport = require('passport');
 const LocalStrategy = require('passport-local').Strategy;
 const FacebookStrategy = require('passport-facebook').Strategy;
-const {User} = require('../config/models');
+const {User, Story} = require('../config/models');
 const router = express.Router();
 const faker = require('faker');
 const fs = require('fs');
-const {ensureLogin} = require('../utils');
+const {ensureLogin, loadUser} = require('../utils');
 
 // DEFINE AUTH STRATEGY
 passport.use(new LocalStrategy({
@@ -92,15 +92,7 @@ router.get('/log-out', (req, res) => {
 // GET USER
 router.get('/get-user', (req, res) => {
     if (req.isAuthenticated()) {
-        res.json({
-            isLoggedIn: true,
-            currentUser: {
-                id: req.user._id,
-                username: req.user.username,
-                email: req.user.email,
-                avatarUrl: req.user.avatarUrl
-            }
-        });
+        loadUser(req, res);
     } else {
         res.json({isLoggedIn: false});
     }
@@ -108,15 +100,7 @@ router.get('/get-user', (req, res) => {
 
 // ENSURE LOGIN
 router.get('/ensure-login', ensureLogin, (req, res) => {
-    res.json({
-        isLoggedIn: true,
-        currentUser: {
-            id: req.user._id,
-            username: req.user.username,
-            email: req.user.email,
-            avatarUrl: req.user.avatarUrl
-        }
-    });
+    loadUser(req, res);
 });
 
 // LOGIN WITH FB

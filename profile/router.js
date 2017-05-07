@@ -26,31 +26,28 @@ router.get('/get/:id', (req, res) => {
 
 // UPLOAD AVATAR
 router.post('/upload-avatar', upload.single('file'), ensureLogin, (req, res, next) => {
+    console.log(req.body);
     cloudinary.v2.uploader.upload(req.file.destination + req.file.filename, {
             public_id: req.body.folder + '/' + req.user._id,
             transformation: JSON.parse(req.body.transformation)
         },
         (err, result) => {
-            if (req.body.folder === 'avatars') {
-                User
-                    .findOneAndUpdate({_id: req.user._id}, {avatarUrl: result.secure_url})
-                    .catch((err) => {
-                        fs.unlink(req.file.destination + req.file.filename, console.log('Temp file successfully deleted'));
-                        res.json({APIerror: 'Error when saving new avatar to DB: ' + err});
-                    });
-                }
-                fs.unlink(req.file.destination + req.file.filename, console.log('Temp file successfully deleted'));
-                return result
-            }
-        ).then((result) => {
-            if (req.body.folder === 'avatars') {
-                res.json({
-                    currentUser: {avatarUrl: result.secure_url},
-                    APImessage: 'New avatar successfully uploaded!'
-                })
-            }
+            User
+                .findOneAndUpdate({ _id: req.user._id }, { avatarUrl: result.secure_url })
+                .catch((err) => {
+                    fs.unlink(req.file.destination + req.file.filename, console.log('Temp file successfully deleted'));
+                    res.json({ APIerror: 'Error when saving new avatar to DB: ' + err });
+                });
+            fs.unlink(req.file.destination + req.file.filename, console.log('Temp file successfully deleted'));
+            return result
         })
-        .catch(err => {res.json({APIerror: 'Error when trying to upload image: ' + err})});
+        .then((result) => {
+            res.json({
+                currentUser: { avatarUrl: result.secure_url },
+                APImessage: 'New avatar successfully uploaded!'
+            })
+        })
+        .catch(err => {res.json({APIerror: 'Error when trying to upload image: ' + err })});
 })
 
 // CHANGE USERNAME

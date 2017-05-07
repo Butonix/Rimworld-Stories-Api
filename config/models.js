@@ -36,9 +36,9 @@ UserSchema.methods.otherProfileRep = function() {
 
 // STORY SCHEMA
 const StorySchema = mongoose.Schema({
-    title: { type: String, required: true },
-    datePosted: { type: Date, required: true },
-    story: { type: String, required: true },
+    title: { type: String },
+    datePosted: { type: Date, default: Date.now },
+    story: { type: String },
     status: { type: String, required: true },
     author: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true }
 }, {
@@ -46,6 +46,6 @@ const StorySchema = mongoose.Schema({
 });
 
 const User = mongoose.model('User', UserSchema);
-const Story = mongoose.model('Request', StorySchema);
+const Story = mongoose.model('Story', StorySchema);
 
 module.exports = {User, Story};
