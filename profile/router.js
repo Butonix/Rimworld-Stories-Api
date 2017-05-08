@@ -1,6 +1,6 @@
 const express = require('express');
 const passport = require('passport');
-const {User} = require('../config/models');
+const {User, Story} = require('../config/models');
 const router = express.Router();
 const fs = require('fs');
 const {ensureLogin} = require('../utils');
@@ -12,16 +12,22 @@ cloudinary.config(CLOUDINARY_API);
 
 // GET PROFILE
 router.get('/get/:id', (req, res) => {
-    return User
-        .findById(req.params.id)
-        .then((user) => {
-            if (req.user && req.user.id === req.params.id) {
-                res.json(user.myProfileRep())
-            } else {
-                res.json(user.otherProfileRep())
-            }
+    Story
+        .find()
+        .where('author').equals(req.params.id)
+        .then((stories) => {
+            return User
+                .findById(req.params.id)
+                .then((user) => {
+                    if (req.user && req.user.id === req.params.id) {
+                        res.json(user.myProfileRep(stories))
+                    } else {
+                        res.json(user.otherProfileRep(stories))
+                    }
+                })
+                .catch(err => {res.json({APIerror: 'Error when fetching user info: ' + err})});
         })
-        .catch(err => {res.json({APIerror: 'Error when fetching user profile: ' + err})});
+        .catch(err => {res.json({APIerror: 'Error when fetching user stories: ' + err})});
 });
 
 // UPLOAD AVATAR

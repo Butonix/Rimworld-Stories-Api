@@ -10,6 +10,17 @@ var upload = multer({ dest: 'temp-uploads/' });
 
 cloudinary.config(CLOUDINARY_API);
 
+// GET LANDING STORIES
+router.get('/get-list', upload.none(), (req, res) => {
+    return Story
+        .find()
+        .populate('author', 'username avatarUrl')
+        .then((stories) => {
+            res.json({stories})
+        })
+        .catch(err => {res.json({APIerror: 'Error when fetching stories: ' + err})});
+});
+
 // SAVE DRAFT
 router.post('/save-draft', upload.none(), ensureLogin, (req, res) => {
     if (req.body.title === '' && req.body.story === '') {
@@ -55,7 +66,6 @@ router.post('/save-draft', upload.none(), ensureLogin, (req, res) => {
 
 // PUBLISH STORY
 router.post('/new', upload.none(), ensureLogin, (req, res) => {
-    console.log(req.body);
     return Story
         .create({
             author: req.user.id,
@@ -74,7 +84,6 @@ router.post('/new', upload.none(), ensureLogin, (req, res) => {
 
 // UPDATE STORY
 router.put('/update', upload.none(), ensureLogin, (req, res) => {
-    console.log(req.body);
     return Story
         .findOneAndUpdate( {_id: req.body.id},
         {

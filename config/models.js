@@ -17,20 +17,22 @@ const UserSchema = mongoose.Schema({
     }
 });
 
-UserSchema.methods.myProfileRep = function() {
+UserSchema.methods.myProfileRep = function(stories) {
     return {
         username: this.username || '',
         email: this.email || '',
         id: this._id,
-        avatarUrl: this.avatarUrl || ''
+        avatarUrl: this.avatarUrl || '',
+        stories
     };
 };
 
-UserSchema.methods.otherProfileRep = function() {
+UserSchema.methods.otherProfileRep = function(stories) {
     return {
         username: this.username || '',
         id: this._id,
-        avatarUrl: this.avatarUrl || ''
+        avatarUrl: this.avatarUrl || '',
+        stories
     };
 };
 
@@ -40,7 +42,8 @@ const StorySchema = mongoose.Schema({
     datePosted: { type: Date, default: Date.now },
     story: { type: String },
     status: { type: String, required: true },
-    author: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true }
+    author: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
+    comments: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Comment' }]
 }, {
     strict: 'throw'
 });
