@@ -35,9 +35,9 @@ const loadUser = (req, res) => {
                     username: req.user.username,
                     email: req.user.email,
                     avatarUrl: req.user.avatarUrl,
-                    stories: stories,
-                    currentDraft: latestDraft
-                }
+                    stories: stories
+                },
+                currentDraft: latestDraft
             });
         })
 }
