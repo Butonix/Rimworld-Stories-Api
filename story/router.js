@@ -10,6 +10,36 @@ var upload = multer({ dest: 'temp-uploads/' });
 
 cloudinary.config(CLOUDINARY_API);
 
+// UPLOAD SCREENSHOT
+router.post('/upload-screenshot', upload.single('file'), ensureLogin, (req, res, next) => {
+    console.log(req.body);
+    if (req.body.storyID === 'null') {
+        return res.json({ APIerror: 'You must save this story as a draft first before uploading a screenshot' });
+    }
+    cloudinary.v2.uploader.upload(req.file.destination + req.file.filename, {
+            public_id: req.body.folder + '/' + req.body.storyID,
+            transformation: JSON.parse(req.body.transformation)
+        },
+        (err, result) => {
+            Story
+                .findOneAndUpdate({ _id: req.body.storyID }, { screenshot: result.secure_url })
+                .catch((err) => {
+                    fs.unlink(req.file.destination + req.file.filename, console.log('Temp file successfully deleted'));
+                    res.json({ APIerror: 'Error when saving new avatar to DB: ' + err });
+                });
+            fs.unlink(req.file.destination + req.file.filename, console.log('Temp file successfully deleted'));
+            return result
+        })
+        .then((result) => {
+            res.json({
+                type: 'screenshot',
+                imgUrl: result.secure_url,
+                APImessage: 'New screenshot successfully uploaded!'
+            })
+        })
+        .catch(err => {res.json({APIerror: 'Error when trying to upload image: ' + err })});
+})
+
 // GET LANDING STORIES
 router.get('/get-list', upload.none(), (req, res) => {
     return Story

@@ -49,6 +49,7 @@ router.post('/upload-avatar', upload.single('file'), ensureLogin, (req, res, nex
         })
         .then((result) => {
             res.json({
+                type: 'avatar',
                 currentUser: { avatarUrl: result.secure_url },
                 APImessage: 'New avatar successfully uploaded!'
             })
