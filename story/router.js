@@ -15,8 +15,20 @@ router.get('/get-list', upload.none(), (req, res) => {
     return Story
         .find()
         .populate('author', 'username avatarUrl')
+        .sort({'datePosted': -1})
         .then((stories) => {
             res.json({stories})
+        })
+        .catch(err => {res.json({APIerror: 'Error when fetching stories: ' + err})});
+});
+
+// SET STORY TO BE LATEST DRAFT
+router.put('/set-to-latest-draft', upload.none(), ensureLogin, (req, res) => {
+    console.log(req.body)
+    return Story
+        .findOneAndUpdate({_id: req.body.id}, {datePosted: Date.now()})
+        .then((story) => {
+            res.json({redirect: '/new-story'})
         })
         .catch(err => {res.json({APIerror: 'Error when fetching stories: ' + err})});
 });
