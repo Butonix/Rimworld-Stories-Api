@@ -18,7 +18,10 @@ router.get('/get/:id', (req, res) => {
         .then((story) => {
             res.json({currentStory: story})
         })
-        .catch(err => {res.json({APIerror: 'Error when fetching story: ' + err})});
+        .catch(err => {res.json({
+            APIerror: 'This story doesn\'t exist',
+            redirect: '/'
+        })});
 });
 
 // UPLOAD SCREENSHOT
