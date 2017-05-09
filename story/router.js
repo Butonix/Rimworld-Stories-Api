@@ -10,10 +10,22 @@ var upload = multer({ dest: 'temp-uploads/' });
 
 cloudinary.config(CLOUDINARY_API);
 
+// GET STORY
+router.get('/get/:id', (req, res) => {
+    Story
+        .findById(req.params.id)
+        .populate('author', 'username avatarUrl')
+        .then((story) => {
+            res.json({currentStory: story})
+        })
+        .catch(err => {res.json({APIerror: 'Error when fetching story: ' + err})});
+});
+
 // UPLOAD SCREENSHOT
 router.post('/upload-screenshot', upload.single('file'), ensureLogin, (req, res, next) => {
     console.log(req.body);
     if (req.body.storyID === 'null') {
+        fs.unlink(req.file.destination + req.file.filename, console.log('Temp file successfully deleted'));
         return res.json({ APIerror: 'You must save this story as a draft first before uploading a screenshot' });
     }
     cloudinary.v2.uploader.upload(req.file.destination + req.file.filename, {
