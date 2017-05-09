@@ -20,14 +20,6 @@ const loadUser = (req, res) => {
         .find()
         .where('author').equals(req.user._id)
         .then((stories) => {
-            let latestDraft = null;
-            // get latest draft
-            stories.forEach((story) => {
-                latestDraft =
-                (latestDraft && story.datePosted.getTime() > latestDraft.datePosted && story.status === 'draft') ||
-                (latestDraft === null && story.status === 'draft')
-                ? story : latestDraft;
-            })
             res.json({
                 isLoggedIn: true,
                 currentUser: {
@@ -36,8 +28,7 @@ const loadUser = (req, res) => {
                     email: req.user.email,
                     avatarUrl: req.user.avatarUrl,
                     stories: stories
-                },
-                currentDraft: latestDraft
+                }
             });
         })
 }

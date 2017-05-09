@@ -10,6 +10,85 @@ var upload = multer({ dest: 'temp-uploads/' });
 
 cloudinary.config(CLOUDINARY_API);
 
+// GET DRAFT
+router.get('/get-draft/:storyID', ensureLogin, (req, res) => {
+    console.log(req.params.storyID);
+    if (req.params.storyID === 'new' || req.params.storyID === 'forceNew') {
+        // check if user has previous draft, otherwise, create a new one
+        Story
+            .find()
+            .where('author').equals(req.user._id)
+            .then((stories) => {
+                let latestDraft = null;
+                // get latest draft
+                stories.forEach((story) => {
+                    latestDraft =
+                    (latestDraft && story.datePosted.getTime() > latestDraft.datePosted && story.status === 'draft') ||
+                    (latestDraft === null && story.status === 'draft')
+                    ? story : latestDraft;
+                });
+                if (latestDraft && req.params.storyID !== 'forceNew') {
+                    console.log('loading latest draft')
+                    return res.json({
+                        APImessage: 'Your latest draft has been loaded',
+                        currentDraft: latestDraft
+                    })
+                } else {
+                    console.log('creating new draft')
+                    return Story
+                        .create({
+                            author: req.user.id,
+                            title: '',
+                            story: '',
+                            status: 'draft',
+                            datePosted: Date.now()
+                        })
+                        .then((story) => {
+                            res.json({
+                                APImessage: 'New draft created',
+                                currentDraft: story,
+                                redirect: '/write-story/new'
+                            })
+                        })
+                        .catch(err => {res.json({APIerror: 'Error when creating draft: ' + err})});
+                }
+            })
+    } else {
+        // if we have to load a specific draft from :storyID
+        console.log('loading specific draft')
+        Story
+            .findById(req.params.storyID)
+            .then((story) => {
+                return res.json({currentDraft: story})
+            })
+            .catch(err => {res.json({
+                APIerror: 'Error loading draft',
+                redirect: '/'
+            })});
+    }
+});
+
+// SAVE DRAFT
+router.post('/save-draft', upload.none(), ensureLogin, (req, res) => {
+    if (req.body.title === '' && req.body.story === '') {
+        return res.json({})
+    }
+    // update current draft
+    return Story
+        .findOneAndUpdate( {_id: req.body.id},
+        {
+            author: req.user.id,
+            title: req.body.title,
+            story: req.body.story,
+            status: req.body.status,
+            datePosted: Date.now()
+        })
+        .then(() => {
+            res.json({ APImessage: 'Draft saved' })
+        })
+        .catch(err => {res.json({APIerror: 'Error when saving draft: ' + err})});
+});
+
 // GET STORY
 router.get('/get/:id', (req, res) => {
     Story
@@ -65,78 +144,6 @@ router.get('/get-list', upload.none(), (req, res) => {
             res.json({stories})
         })
         .catch(err => {res.json({APIerror: 'Error when fetching stories: ' + err})});
-});
-
-// SET STORY TO BE LATEST DRAFT
-router.put('/set-to-latest-draft', upload.none(), ensureLogin, (req, res) => {
-    console.log(req.body)
-    return Story
-        .findOneAndUpdate({_id: req.body.id}, {datePosted: Date.now()})
-        .then((story) => {
-            res.json({redirect: '/new-story'})
-        })
-        .catch(err => {res.json({APIerror: 'Error when fetching stories: ' + err})});
-});
-
-// SAVE DRAFT
-router.post('/save-draft', upload.none(), ensureLogin, (req, res) => {
-    if (req.body.title === '' && req.body.story === '') {
-        return res.json({})
-    }
-    // update current draft
-    if (req.body.id !== 'null') {
-        return Story
-            .findOneAndUpdate( {_id: req.body.id},
-            {
-                author: req.user.id,
-                title: req.body.title,
-                story: req.body.story,
-                status: req.body.status,
-                datePosted: Date.now()
-            })
-            .then(() => {
-                res.json({ APImessage: 'Draft auto saved' })
-            })
-            .catch(err => {res.json({APIerror: 'Error when saving draft: ' + err})});
-    } else {
-        // create new draft
-        if (req.body.title === '' && req.body.story === '') {
-            return res.json({})
-        }
-        return Story
-            .create({
-                author: req.user.id,
-                title: req.body.title,
-                story: req.body.story,
-                status: 'draft',
-                datePosted: Date.now()
-            })
-            .then((story) => {
-                res.json({
-                    APImessage: 'Draft auto saved',
-                    storyID: story._id
-                })
-            })
-            .catch(err => {res.json({APIerror: 'Error when saving draft: ' + err})});
-    }
-});
-
-// PUBLISH STORY
-router.post('/new', upload.none(), ensureLogin, (req, res) => {
-    return Story
-        .create({
-            author: req.user.id,
-            title: req.body.title,
-            story: req.body.story,
-            status: 'published'
-        })
-        .then(() => {
-            res.json({
-                redirect: '/',
-                APImessage: 'Story successfully published!'
-            })
-        })
-        .catch(err => {res.json({APIerror: 'Error when submitting new story: ' + err})});
 });
 
 // UPDATE STORY
