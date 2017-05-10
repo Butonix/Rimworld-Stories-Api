@@ -1,6 +1,6 @@
 const express = require('express');
 const passport = require('passport');
-const {User, Story} = require('../config/models');
+const {User, Story, Comment} = require('../config/models');
 const router = express.Router();
 const fs = require('fs');
 const {ensureLogin} = require('../utils');
@@ -12,7 +12,6 @@ cloudinary.config(CLOUDINARY_API);
 
 // GET DRAFT
 router.get('/get-draft/:storyID', ensureLogin, (req, res) => {
-    console.log(req.params.storyID);
     if (req.params.storyID === 'new' || req.params.storyID === 'forceNew') {
         // check if user has previous draft, otherwise, create a new one
         Story
@@ -91,16 +90,23 @@ router.post('/save-draft', upload.none(), ensureLogin, (req, res) => {
 
 // GET STORY
 router.get('/get/:id', (req, res) => {
-    Story
-        .findById(req.params.id)
+    return Comment
+        .find()
+        .where({story: req.params.id})
         .populate('author', 'username avatarUrl')
-        .then((story) => {
-            res.json({currentStory: story})
+        .then((comments) => {
+            Story
+                .findById(req.params.id)
+                .populate('author', 'username avatarUrl')
+                .then((story) => {
+                    story.comments = comments;
+                    res.json({currentStory: story})
+                })
+                .catch(err => {res.json({
+                    APIerror: 'This story doesn\'t exist',
+                    redirect: '/'
+                })});
         })
-        .catch(err => {res.json({
-            APIerror: 'This story doesn\'t exist',
-            redirect: '/'
-        })});
 });
 
 // UPLOAD SCREENSHOT

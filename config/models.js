@@ -49,7 +49,18 @@ const StorySchema = mongoose.Schema({
     strict: 'throw'
 });
 
+// COMMENT SCHEMA
+const CommentSchema = mongoose.Schema({
+    datePosted: { type: Date, default: Date.now },
+    comment: { type: String },
+    author: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
+    story: { type: mongoose.Schema.Types.ObjectId, ref: 'Story', required: true }
+}, {
+    strict: 'throw'
+});
+
 const User = mongoose.model('User', UserSchema);
 const Story = mongoose.model('Story', StorySchema);
+const Comment = mongoose.model('Comment', CommentSchema);
 
-module.exports = {User, Story};
+module.exports = {User, Story, Comment};

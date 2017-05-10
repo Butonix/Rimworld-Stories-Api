@@ -31,6 +31,7 @@ function loadConfig (configPath) {
 const {router: authRouter} = require('./auth');
 const {router: profileRouter} = require('./profile');
 const {router: storyRouter} = require('./story');
+const {router: commentRouter} = require('./comment');
 
 let server;
 mongoose.Promise = global.Promise;
@@ -64,6 +65,7 @@ app.use(passport.session());
 app.use('/auth/', authRouter);
 app.use('/profile/', profileRouter);
 app.use('/story/', storyRouter);
+app.use('/comment/', commentRouter);
 
 app.use('*', (req, res) => {
     return res.status(404).json({message: '404 - Not Found'});
