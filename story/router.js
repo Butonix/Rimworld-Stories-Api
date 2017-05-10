@@ -90,23 +90,24 @@ router.post('/save-draft', upload.none(), ensureLogin, (req, res) => {
 
 // GET STORY
 router.get('/get/:id', (req, res) => {
-    return Comment
-        .find()
-        .where({story: req.params.id})
+    return Story
+        .findById(req.params.id)
         .populate('author', 'username avatarUrl')
-        .then((comments) => {
-            Story
-                .findById(req.params.id)
-                .populate('author', 'username avatarUrl')
-                .then((story) => {
-                    story.comments = comments;
-                    res.json({currentStory: story})
-                })
-                .catch(err => {res.json({
-                    APIerror: 'This story doesn\'t exist',
-                    redirect: '/'
-                })});
+        .populate({
+             path: 'comments',
+             populate: {
+               path: 'author',
+               select: 'username avatarUrl',
+               model: 'User'
+             }
+          })
+        .then((story) => {
+            res.json({currentStory: story})
         })
+        .catch(err => {res.json({
+            APIerror: 'This story doesn\'t exist',
+            redirect: '/'
+        })});
 });
 
 // UPLOAD SCREENSHOT

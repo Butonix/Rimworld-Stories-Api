@@ -16,9 +16,14 @@ router.post('/new-comment', upload.none(), ensureLogin, (req, res) => {
             datePosted: Date.now()
         })
         .then((comment) => {
-            res.json({
-                APImessage: 'Comment posted'
-            })
+            Story
+                .findById(comment.story)
+                .update({ $push: { comments: comment._id } })
+                .then(() => {
+                    res.json({
+                        APImessage: 'Comment posted'
+                    })
+                })
         })
         .catch(err => {res.json({APIerror: 'Error when creating comment: ' + err})});
 });
