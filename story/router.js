@@ -10,6 +10,25 @@ var upload = multer({ dest: 'temp-uploads/' });
 
 cloudinary.config(CLOUDINARY_API);
 
+// DELETE STORY
+router.delete('/:id', ensureLogin, (req, res) => {
+    console.log(req.params.id)
+    Story
+        .findOneAndRemove({_id: req.params.id})
+        .then(() => {
+            Comment
+                .find()
+                .where({story: req.params.id})
+                .remove()
+                .then(() => {
+                    res.json({
+                        APImessage: 'Story deleted',
+                        redirect: '/'
+                    })
+                })
+        })
+});
+
 // GET DRAFT
 router.get('/get-draft/:storyID', ensureLogin, (req, res) => {
     if (req.params.storyID === 'new' || req.params.storyID === 'forceNew') {
@@ -72,6 +91,15 @@ router.post('/save-draft', upload.none(), ensureLogin, (req, res) => {
     if (req.body.title === '' && req.body.story === '') {
         return res.json({})
     }
+    let status, date;
+    if (req.body.status === 'published') {
+        console.log(req.body.datePosted)
+        date = req.body.datePosted;
+        status = 'published';
+    } else {
+        date = Date.now();
+        status = 'draft';
+    }
     // update current draft
     return Story
         .findOneAndUpdate( {_id: req.body.id},
@@ -79,8 +107,8 @@ router.post('/save-draft', upload.none(), ensureLogin, (req, res) => {
             author: req.user.id,
             title: req.body.title,
             story: req.body.story,
-            status: req.body.status,
-            datePosted: Date.now()
+            status: status,
+            datePosted: date
         })
         .then(() => {
             res.json({ APImessage: 'Draft saved' })
@@ -155,14 +183,22 @@ router.get('/get-list', upload.none(), (req, res) => {
 
 // UPDATE STORY
 router.put('/update', upload.none(), ensureLogin, (req, res) => {
+    console.log(req.body.status);
+    let date;
+    if (req.body.status === 'published') {
+        date = req.body.datePosted;
+    } else {
+        console.log(Date.now())
+        date = Date.now();
+    }
     return Story
         .findOneAndUpdate( {_id: req.body.id},
         {
             author: req.user.id,
             title: req.body.title,
             story: req.body.story,
-            status: req.body.status,
-            datePosted: Date.now()
+            status: 'published',
+            datePosted: date
         })
         .then(() => {
             res.json({
