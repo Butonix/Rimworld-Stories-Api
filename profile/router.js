@@ -5,13 +5,19 @@ const router = express.Router();
 const fs = require('fs');
 const {ensureLogin} = require('../utils');
 const cloudinary = require('cloudinary');
-var multer  = require('multer');
-var upload = multer({ dest: 'temp-uploads/' });
+const multer  = require('multer');
+const upload = multer({ dest: 'temp-uploads/' });
+const mongoose = require('mongoose');
 
 cloudinary.config(CLOUDINARY_API);
 
 // GET PROFILE
 router.get('/get/:id', (req, res) => {
+    if (!mongoose.Types.ObjectId.isValid(req.params.id)) {res.json({
+          APIerror: 'Invalid profile ID',
+          redirect: '/'
+        })
+    }
     let profileStories;
     Story
         .find()

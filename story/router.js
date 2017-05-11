@@ -5,8 +5,9 @@ const router = express.Router();
 const fs = require('fs');
 const {ensureLogin} = require('../utils');
 const cloudinary = require('cloudinary');
-var multer  = require('multer');
-var upload = multer({ dest: 'temp-uploads/' });
+const multer  = require('multer');
+const upload = multer({ dest: 'temp-uploads/' });
+const mongoose = require('mongoose');
 
 cloudinary.config(CLOUDINARY_API);
 
@@ -114,6 +115,11 @@ router.post('/save-draft', upload.none(), ensureLogin, (req, res) => {
 
 // GET STORY
 router.get('/get/:id', (req, res) => {
+    if (!mongoose.Types.ObjectId.isValid(req.params.id)) {res.json({
+          APIerror: 'Invalid story ID',
+          redirect: '/'
+        })
+    }
     return Story
         .findById(req.params.id)
         .update({$inc: {views:1}})
@@ -136,7 +142,7 @@ router.get('/get/:id', (req, res) => {
         .catch(err => {res.json({
           APIerror: 'This story doesn\'t exist',
           redirect: '/'
-        })});
+        })})
 });
 
 // UPLOAD SCREENSHOT
@@ -173,6 +179,7 @@ router.post('/upload-screenshot', upload.single('file'), ensureLogin, (req, res,
 router.get('/get-list', upload.none(), (req, res) => {
     return Story
         .find()
+        .where({status: 'published'})
         .populate('author', 'username avatarUrl')
         .sort({'datePosted': -1})
         .then((stories) => {

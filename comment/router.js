@@ -4,8 +4,8 @@ const {User, Story, Comment} = require('../config/models');
 const router = express.Router();
 const fs = require('fs');
 const {ensureLogin} = require('../utils');
-var multer  = require('multer');
-var upload = multer({ dest: 'temp-uploads/' });
+const multer  = require('multer');
+const upload = multer({ dest: 'temp-uploads/' });
 
 // DELETE COMMENT
 router.delete('/:id', ensureLogin, (req, res) => {
@@ -33,7 +33,9 @@ router.delete('/:id', ensureLogin, (req, res) => {
 
 // POST NEW COMMENT
 router.post('/new-comment', upload.none(), ensureLogin, (req, res) => {
-    let postedComment;
+    if (!req.body.comment) {
+        return res.json({APIerror: 'Your comment is empty'})
+    }
     return Comment
         .create({
             author: req.user.id,
@@ -42,15 +44,13 @@ router.post('/new-comment', upload.none(), ensureLogin, (req, res) => {
             datePosted: Date.now()
         })
         .then((comment) => {
-            postedComment = comment;
             return Story
-                .findById(comment.story)
-                .update({ $push: { comments: comment._id } })
+                .findByIdAndUpdate(comment.story, { $push: { comments: comment } })
         })
         .then((story) => {
             return Comment
                 .find()
-                .where({story: postedComment.story})
+                .where({story: story._id})
                 .populate('author', 'username avatarUrl')
         })
         .then((comments) => {
