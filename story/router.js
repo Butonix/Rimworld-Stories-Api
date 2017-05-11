@@ -118,24 +118,30 @@ router.post('/save-draft', upload.none(), ensureLogin, (req, res) => {
 
 // GET STORY
 router.get('/get/:id', (req, res) => {
+
     return Story
         .findById(req.params.id)
-        .populate('author', 'username avatarUrl')
-        .populate({
-             path: 'comments',
-             populate: {
-               path: 'author',
-               select: 'username avatarUrl',
-               model: 'User'
-             }
-          })
-        .then((story) => {
-            res.json({currentStory: story})
+        .update({$inc: {views:1}})
+        .then(() => {
+            return Story
+                .findById(req.params.id)
+                .populate('author', 'username avatarUrl')
+                .populate({
+                     path: 'comments',
+                     populate: {
+                       path: 'author',
+                       select: 'username avatarUrl',
+                       model: 'User'
+                     }
+                  })
+                .then((story) => {
+                    res.json({currentStory: story})
+                })
+                .catch(err => {res.json({
+                    APIerror: 'This story doesn\'t exist',
+                    redirect: '/'
+                })});
         })
-        .catch(err => {res.json({
-            APIerror: 'This story doesn\'t exist',
-            redirect: '/'
-        })});
 });
 
 // UPLOAD SCREENSHOT

@@ -7,6 +7,32 @@ const {ensureLogin} = require('../utils');
 var multer  = require('multer');
 var upload = multer({ dest: 'temp-uploads/' });
 
+// DELETE COMMENT
+router.delete('/:id', ensureLogin, (req, res) => {
+    console.log(req.body)
+    Story
+        .findById(req.body.storyID)
+        .update({ $pullAll: { comments: [ req.params.id ] } })
+        .then(() => {
+            Comment
+                .findByIdAndRemove(req.params.id)
+                .then(() => {
+                    Comment
+                        .find()
+                        .where({story: req.body.storyID})
+                        .populate('author', 'username avatarUrl')
+                        .then((comments) => {
+                            res.json({
+                                APImessage: 'Comment deleted',
+                                comments
+                            })
+                        })
+                })
+        })
+        .catch(err => {res.json({APIerror: 'Error when deleting comment: ' + err})});
+});
+
+// POST NEW COMMENT
 router.post('/new-comment', upload.none(), ensureLogin, (req, res) => {
     return Comment
         .create({
