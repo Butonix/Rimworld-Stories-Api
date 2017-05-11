@@ -90,7 +90,6 @@ router.post('/save-draft', upload.none(), ensureLogin, (req, res) => {
     }
     let status, date;
     if (req.body.status === 'published') {
-        console.log(req.body.datePosted)
         date = req.body.datePosted;
         status = 'published';
     } else {
@@ -142,7 +141,6 @@ router.get('/get/:id', (req, res) => {
 
 // UPLOAD SCREENSHOT
 router.post('/upload-screenshot', upload.single('file'), ensureLogin, (req, res, next) => {
-    console.log(req.body);
     if (req.body.storyID === 'null') {
         fs.unlink(req.file.destination + req.file.filename, console.log('Temp file successfully deleted'));
         return res.json({ APIerror: 'You must save this story as a draft first before uploading a screenshot' });
@@ -178,15 +176,17 @@ router.get('/get-list', upload.none(), (req, res) => {
         .populate('author', 'username avatarUrl')
         .sort({'datePosted': -1})
         .then((stories) => {
-            res.json({stories})
+            if (stories.length === 0) {
+                return res.json({stories: ['none']})
+            }
+            return res.json({stories})
         })
         .catch(err => {res.json({APIerror: 'Error when fetching stories: ' + err})});
 });
 
 // UPDATE STORY
 router.put('/update', upload.none(), ensureLogin, (req, res) => {
-    let date;
-    console.log(req.body);
+    let date, message;
     if (req.body.title === '') {
         return res.json({APIerror: 'Your story needs a title'})
     }
@@ -195,9 +195,10 @@ router.put('/update', upload.none(), ensureLogin, (req, res) => {
     }
     if (req.body.status === 'published') {
         date = req.body.datePosted;
+        message = 'Story successfully created';
     } else {
-        console.log(Date.now())
         date = Date.now();
+        message = 'Story successfully posted';
     }
     return Story
         .findOneAndUpdate( {_id: req.body.id},
@@ -210,8 +211,8 @@ router.put('/update', upload.none(), ensureLogin, (req, res) => {
         })
         .then(() => {
             res.json({
-                redirect: '/',
-                APImessage: 'Story successfully updated!'
+                redirect: '/story/' + req.body.id,
+                APImessage: message
             })
         })
         .catch(err => {res.json({APIerror: 'Error when submitting new story: ' + err})});
