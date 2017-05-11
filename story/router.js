@@ -12,21 +12,21 @@ cloudinary.config(CLOUDINARY_API);
 
 // DELETE STORY
 router.delete('/:id', ensureLogin, (req, res) => {
-    console.log(req.params.id)
     Story
         .findOneAndRemove({_id: req.params.id})
         .then(() => {
-            Comment
+            return Comment
                 .find()
                 .where({story: req.params.id})
                 .remove()
-                .then(() => {
-                    res.json({
-                        APImessage: 'Story deleted',
-                        redirect: '/'
-                    })
-                })
         })
+        .then(() => {
+            res.json({
+                APImessage: 'Story deleted',
+                redirect: '/'
+            })
+        })
+        .catch(err => {res.json({APIerror: 'Error when deleting comment: ' + err})});
 });
 
 // GET DRAFT
@@ -46,13 +46,11 @@ router.get('/get-draft/:storyID', ensureLogin, (req, res) => {
                     ? story : latestDraft;
                 });
                 if (latestDraft && req.params.storyID !== 'forceNew') {
-                    console.log('loading latest draft')
                     return res.json({
                         APImessage: 'Your latest draft has been loaded',
                         currentDraft: latestDraft
                     })
                 } else {
-                    console.log('creating new draft')
                     return Story
                         .create({
                             author: req.user.id,
@@ -73,7 +71,6 @@ router.get('/get-draft/:storyID', ensureLogin, (req, res) => {
             })
     } else {
         // if we have to load a specific draft from :storyID
-        console.log('loading specific draft')
         Story
             .findById(req.params.storyID)
             .then((story) => {
@@ -118,7 +115,6 @@ router.post('/save-draft', upload.none(), ensureLogin, (req, res) => {
 
 // GET STORY
 router.get('/get/:id', (req, res) => {
-
     return Story
         .findById(req.params.id)
         .update({$inc: {views:1}})
@@ -134,14 +130,14 @@ router.get('/get/:id', (req, res) => {
                        model: 'User'
                      }
                   })
-                .then((story) => {
-                    res.json({currentStory: story})
-                })
-                .catch(err => {res.json({
-                    APIerror: 'This story doesn\'t exist',
-                    redirect: '/'
-                })});
         })
+        .then((story) => {
+          res.json({currentStory: story})
+        })
+        .catch(err => {res.json({
+          APIerror: 'This story doesn\'t exist',
+          redirect: '/'
+        })});
 });
 
 // UPLOAD SCREENSHOT
@@ -189,8 +185,14 @@ router.get('/get-list', upload.none(), (req, res) => {
 
 // UPDATE STORY
 router.put('/update', upload.none(), ensureLogin, (req, res) => {
-    console.log(req.body.status);
     let date;
+    console.log(req.body);
+    if (req.body.title === '') {
+        return res.json({APIerror: 'Your story needs a title'})
+    }
+    if (req.body.story === '') {
+        return res.json({APIerror: 'Your story cannot be empty'})
+    }
     if (req.body.status === 'published') {
         date = req.body.datePosted;
     } else {

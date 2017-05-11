@@ -12,22 +12,23 @@ cloudinary.config(CLOUDINARY_API);
 
 // GET PROFILE
 router.get('/get/:id', (req, res) => {
+    let profileStories;
     Story
         .find()
         .where('author').equals(req.params.id)
         .then((stories) => {
+            profileStories = stories;
             return User
                 .findById(req.params.id)
-                .then((user) => {
-                    if (req.user && req.user.id === req.params.id) {
-                        res.json(user.myProfileRep(stories))
-                    } else {
-                        res.json(user.otherProfileRep(stories))
-                    }
-                })
-                .catch(err => {res.json({APIerror: 'Error when fetching user info: ' + err})});
         })
-        .catch(err => {res.json({APIerror: 'Error when fetching user stories: ' + err})});
+        .then((user) => {
+            if (req.user && req.user.id === req.params.id) {
+                res.json(user.myProfileRep(profileStories))
+            } else {
+                res.json(user.otherProfileRep(profileStories))
+            }
+        })
+        .catch(err => {res.json({APIerror: 'Error when fetching profile: ' + err})});
 });
 
 // UPLOAD AVATAR
