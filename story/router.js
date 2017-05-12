@@ -11,6 +11,41 @@ const mongoose = require('mongoose');
 
 cloudinary.config(CLOUDINARY_API);
 
+// STAR STORY
+router.post('/star/:storyID', ensureLogin, (req, res) => {
+    console.log(req.body)
+    if (req.body.type === 'star') {
+        Story
+            .findByIdAndUpdate(req.params.storyID, { $push: { stars: req.user._id } })
+            .then (() => {
+                return Story
+                    .findById(req.params.storyID)
+            })
+            .then((story) => {
+                res.json({
+                    APImessage: 'You have starred this story',
+                    story
+                })
+            })
+            .catch(err => {res.json({APIerror: 'Error when starring story: ' + err})});
+    }
+    if (req.body.type === 'unstar') {
+        Story
+            .findByIdAndUpdate(req.params.storyID, { $pullAll: { stars: [req.user._id] } })
+            .then (() => {
+                return Story
+                    .findById(req.params.storyID)
+            })
+            .then((story) => {
+                res.json({
+                    APImessage: 'You have unstarred this story',
+                    story
+                })
+            })
+            .catch(err => {res.json({APIerror: 'Error when unstarring story: ' + err})});
+    }
+});
+
 // DELETE STORY
 router.delete('/:id', ensureLogin, (req, res) => {
     Story
@@ -176,17 +211,32 @@ router.post('/upload-screenshot', upload.single('file'), ensureLogin, (req, res,
 })
 
 // GET LANDING STORIES
-router.get('/get-list', upload.none(), (req, res) => {
+router.post('/get-list', (req, res) => {
+    console.log(req.body.filters)
+    let filterType;
+    if (req.body.filters.type === ('Most viewed')) {
+        filterType = {'views': -1};
+    } else if (req.body.filters.type === ('Most starred')) {
+        filterType = {'stars': -1};
+    } else if (req.body.filters.type === ('Most recent')) {
+        filterType = {'datePosted': -1};
+    }
     return Story
         .find()
         .where({status: 'published'})
         .populate('author', 'username avatarUrl')
-        .sort({'datePosted': -1})
+        .sort(filterType)
         .then((stories) => {
             if (stories.length === 0) {
-                return res.json({stories: ['none']})
+                return res.json({
+                    stories: ['none'],
+                    filters: req.body.filters
+                })
             }
-            return res.json({stories})
+            return res.json({
+                stories,
+                filters: req.body.filters
+            })
         })
         .catch(err => {res.json({APIerror: 'Error when fetching stories: ' + err})});
 });

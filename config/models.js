@@ -45,7 +45,8 @@ const StorySchema = mongoose.Schema({
     author: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
     comments: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Comment' }],
     screenshot: { type: String },
-    views: { type: Number, default: 0 }
+    views: { type: Number, default: 0 },
+    stars: { type: Array }
 }, {
     strict: 'throw'
 });

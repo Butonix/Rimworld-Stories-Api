@@ -67,8 +67,8 @@ router.post('/upload-avatar', upload.single('file'), ensureLogin, (req, res, nex
 // CHANGE USERNAME
 router.post('/change-username', ensureLogin, (req, res) => {
     username = req.body.username.trim();
-    if (username.length < 3 || username.length > 15) {
-        return res.json({APIerror: 'Your username should contain between 3 and 15 characters'})
+    if (username.length < 3 || username.length > 13) {
+        return res.json({APIerror: 'Your username should contain between 3 and 13 characters'})
     }
     if (typeof username !== 'string') {
         return res.json({APIerror: 'Incorrect type'})
