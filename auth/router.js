@@ -7,6 +7,92 @@ const router = express.Router();
 const faker = require('faker');
 const fs = require('fs');
 const {ensureLogin, loadUser} = require('../utils');
+const multer  = require('multer');
+const upload = multer({ dest: 'temp-uploads/' });
+
+// CREATE NEW USER
+router.post('/signup', upload.none(), (req, res) => {
+    console.log(req.body)
+    if (!req.body) {
+        return res.json({APIerror: 'No request body'});
+    }
+    if (!('username' in req.body)) {
+        return res.json({APIerror: 'Missing field: Username'});
+    }
+    if (!('email' in req.body)) {
+        return res.json({APIerror: 'Missing field: E-mail'});
+    }
+    if (!('password' in req.body)) {
+        return res.json({APIerror: 'Missing field: Password'});
+    }
+
+    let {username, password, email} = req.body;
+
+    if (typeof username !== 'string') {
+        return res.json({APIerror: 'Incorrect field type: username'});
+    }
+
+    username = username.trim();
+    email = email.trim();
+    password = password.trim();
+
+    if (username === '') {
+        return res.json({APIerror: 'You must provide a user name'});
+    }
+    if (email === '') {
+        return res.json({APIerror: 'You must provide an email address'});
+    }
+    if (!(password)) {
+        return res.json({APIerror: 'You must provide a password'});
+    }
+    if (typeof password !== 'string') {
+        return res.json({APIerror: 'Incorrect field type: password'});
+    }
+    if (password === '') {
+        return res.json({APIerror: 'You must provide a password'});
+    }
+
+    // check for existing user
+    return User
+    .find({email : email})
+    .count()
+    .then(count => {
+        if (count > 0) {
+            return res.json({APIerror: 'This email address is already registered'});
+        }
+    // if no existing user, hash password
+    return User.hashPassword(password);
+    })
+    .then(hash => {
+        console.log('ok')
+        return User
+        .create({
+            username: username,
+            password: hash,
+            email: email,
+            authType: 'normal',
+        });
+    })
+    .then(user => {
+        return res.json({APImessage: 'Account created! You can now log in with your credentials.'});
+    })
+    .catch(err => {
+        return res.json({APIerror: err.errmsg});
+    });
+});
+
+// LOG IN
+router.post('/login', upload.none(), passport.authenticate('local'), ensureLogin, (req, res, next) => {
+    User.findOne({ email: req.body.email }, (err, user) => {
+        if (err) {
+            return res.json({APIerror: 'Incorrect email/password.'});
+        }
+        return res.json({
+            APImessage: 'Login successful',
+            redirect: '/profile/' + req.user.id
+        });
+    });
+});
 
 // DEFINE AUTH STRATEGY
 passport.use(new LocalStrategy({

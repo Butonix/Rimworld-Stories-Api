@@ -10,7 +10,7 @@ const UserSchema = mongoose.Schema({
     email: { type: String, required: true, unique: true },
     password: { type: String, required: true },
     banned: { type: Boolean, default: false },
-    avatarUrl: { type: String },
+    avatarUrl: { type: String, default: "https://res.cloudinary.com/zeropointtwo/image/upload/v1494665492/default-avatar_qdvhq8.png" },
     facebook: {
         id: {type: String},
         token: {type: String}
@@ -34,6 +34,14 @@ UserSchema.methods.otherProfileRep = function(stories) {
         avatarUrl: this.avatarUrl || '',
         stories
     };
+};
+
+UserSchema.methods.validatePassword = function(password) {
+    return bcrypt.compare(password, this.password);
+};
+
+UserSchema.statics.hashPassword = function(password) {
+    return bcrypt.hash(password, 10);
 };
 
 // STORY SCHEMA

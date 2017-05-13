@@ -212,7 +212,6 @@ router.post('/upload-screenshot', upload.single('file'), ensureLogin, (req, res,
 
 // GET LANDING STORIES
 router.post('/get-list', (req, res) => {
-    console.log(req.body.filters)
     let filterType;
     if (req.body.filters.type === ('Most viewed')) {
         filterType = {'views': -1};
