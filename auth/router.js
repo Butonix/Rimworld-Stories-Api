@@ -12,7 +12,6 @@ const upload = multer({ dest: 'temp-uploads/' });
 
 // CREATE NEW USER
 router.post('/signup', upload.none(), (req, res) => {
-    console.log(req.body)
     if (!req.body) {
         return res.json({APIerror: 'No request body'});
     }
@@ -39,6 +38,9 @@ router.post('/signup', upload.none(), (req, res) => {
     if (username === '') {
         return res.json({APIerror: 'You must provide a user name'});
     }
+    if (username.length < 3 || username.length > 13) {
+        return res.json({APIerror: 'Your username should have between 3 and 13 characters'});
+    }
     if (email === '') {
         return res.json({APIerror: 'You must provide an email address'});
     }
@@ -64,7 +66,6 @@ router.post('/signup', upload.none(), (req, res) => {
     return User.hashPassword(password);
     })
     .then(hash => {
-        console.log('ok')
         return User
         .create({
             username: username,
