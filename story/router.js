@@ -11,6 +11,55 @@ const mongoose = require('mongoose');
 
 cloudinary.config(CLOUDINARY_API);
 
+// GET LANDING STORIES
+router.post('/get-list', (req, res) => {
+    let filterType;
+    if (req.body.filters.type === ('Most viewed')) {
+        filterType = {'views': -1};
+    } else if (req.body.filters.type === ('Most starred')) {
+        filterType = {'stars': -1};
+    } else if (req.body.filters.type === ('Most recent')) {
+        filterType = {'datePosted': -1};
+    }
+    let totalResults;
+    return Story
+        .find()
+        .where({status: 'published'})
+        .count()
+        .then(total => totalResults = total)
+        .then(() => {
+            return Story
+                .find()
+                .where({status: 'published'})
+                .populate('author', 'username avatarUrl')
+                .sort(filterType)
+                .limit(Number(req.body.filters.perPage*(req.body.filters.page + 1)))
+                .then((stories) => {
+                    if (stories.length === 0) {
+                        return res.json({
+                            stories: ['none'],
+                            filters: {
+                                type: req.body.filters.type,
+                                page: 0,
+                                perPage: req.body.filters.perPage,
+                                total: totalResults
+                            }
+                        })
+                    }
+                    return res.json({
+                        stories,
+                        filters: {
+                            type: req.body.filters.type,
+                            page: req.body.filters.page + 1,
+                            perPage: req.body.filters.perPage,
+                            total: totalResults
+                        }
+                    })
+                })
+        })
+        .catch(err => {res.json({APIerror: 'Error when fetching stories: ' + err})});
+});
+
 // STAR STORY
 router.post('/star/:storyID', ensureLogin, (req, res) => {
     console.log(req.body)
@@ -209,36 +258,6 @@ router.post('/upload-screenshot', upload.single('file'), ensureLogin, (req, res,
         })
         .catch(err => {res.json({APIerror: 'Error when trying to upload image: ' + err })});
 })
-
-// GET LANDING STORIES
-router.post('/get-list', (req, res) => {
-    let filterType;
-    if (req.body.filters.type === ('Most viewed')) {
-        filterType = {'views': -1};
-    } else if (req.body.filters.type === ('Most starred')) {
-        filterType = {'stars': -1};
-    } else if (req.body.filters.type === ('Most recent')) {
-        filterType = {'datePosted': -1};
-    }
-    return Story
-        .find()
-        .where({status: 'published'})
-        .populate('author', 'username avatarUrl')
-        .sort(filterType)
-        .then((stories) => {
-            if (stories.length === 0) {
-                return res.json({
-                    stories: ['none'],
-                    filters: req.body.filters
-                })
-            }
-            return res.json({
-                stories,
-                filters: req.body.filters
-            })
-        })
-        .catch(err => {res.json({APIerror: 'Error when fetching stories: ' + err})});
-});
 
 // UPDATE STORY
 router.put('/update', upload.none(), ensureLogin, (req, res) => {
