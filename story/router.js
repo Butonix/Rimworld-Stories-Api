@@ -106,6 +106,7 @@ router.delete('/:id', ensureLogin, (req, res) => {
                 .remove()
         })
         .then(() => {
+            cloudinary.uploader.destroy('screenshots/' + req.params.id, (result) => { console.log(result) });
             res.json({
                 APImessage: 'Story deleted',
                 redirect: '/'
