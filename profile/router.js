@@ -80,7 +80,7 @@ router.post('/change-username', ensureLogin, (req, res) => {
                 res.json({APIerror: 'This username is already taken, please choose another one'})
             } else {
                 return User
-                    .findOneAndUpdate({username: username})
+                    .findOneAndUpdate({_id: req.user._id}, {username: username})
                     .then(() => res.json({
                         currentUser: {username: username},
                         APImessage: 'User name successfully changed!'
