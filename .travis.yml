@@ -6,6 +6,6 @@ deploy:
   provider: heroku
   api_key:
     secure: VKpRV4BruWLWVAyqNwKKgJRfs7QlLalqusaDlf4ykaR3psU14VKUvhJx9+KIFyVxetQm8yoAk8W1/k0Wvb/HIWWq0T7GjB8KazbJskJcHXbmTKQm/MD1l/0Elhh6T+spN4ywDi3C35CDE8R5iMerXaP1xsfD7xjp08FYFOn021yYyUhcwI5/26+3LTh1KCJ7NmQNpu3miJsjWUkAkPPNSHEXxxOkKh3ugpOpLFt9EN87506089sBuwVu+WepuXjFZL65Dyon8xBXdP9mjnhCuaMle1LKda0DGNdGOjIPu9EfIT/vth45xSUjbvv2QQeCnHDsBX1pPWv0zrOw3zgeiCInYyktTbk5oyw+G81yr6kFyUUNw+C6RepVG6FAndsSGB5Xnj2yrXg8aOOx1oz0PwSiDLqasJaSRm/+Z3j3EwPGMa4AiPR4Xo0UUAAwzCirlbtNLHa1KQMj799m4AizdnPy03wXMKMpb+mK1hdCZCabXVzxxL9TxnQXdf+NuU5lhaZDQXvD2VcLLZ1qc+vwLIn8gjaS/pMQC7p4vM1mYiOvt1eQiBFDbfWO96Bv0iPP/vPeetix/L6t1/TUyr7xZ5nfi7OuvV2tPxQwwNBqJRzNOLBbznEGp8tG9ySAFl+QWdMlrCulggWxZ+gN3s/ip47EDBH2C4rBlzy6R69etzk=
-  app: fathomless-chamber-86254
+  app: rimworld-stories
   on:
     repo: NicolasMachado/Rimworld-Stories-Api
