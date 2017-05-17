@@ -157,9 +157,17 @@ router.get('/get-draft/:storyID', ensureLogin, (req, res) => {
             })
     } else {
         // if we have to load a specific draft from :storyID
-        Story
+        return Story
             .findById(req.params.storyID)
             .then((story) => {
+                console.log(req.user.id)
+                console.log(story.author)
+                if (String(req.user.id) !== String(story.author)) {
+                    return res.json({
+                        APIerror: 'You are not the author of this story',
+                        redirect: '/'
+                    })
+                }
                 return res.json({currentDraft: story})
             })
             .catch(err => {res.json({

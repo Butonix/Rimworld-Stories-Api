@@ -17,6 +17,7 @@
     "express": "^4.15.2",
     "express-session": "^1.15.2",
     "faker": "^4.1.0",
+    "form-data": "^2.1.4",
     "mongoose": "^4.9.7",
     "morgan": "^1.8.1",
     "multer": "^1.3.0",
