@@ -41,7 +41,7 @@ const app = express();
 // Enable CORS
 app.use((req, res, next) => {
 
-    const allowedOrigins = [CLIENT_URL, 'https://www.rimworld-stories.com'];
+    const allowedOrigins = [CLIENT_URL, 'https://www.rimworld-stories.com', 'http://www.rimworld-stories.com'];
     const origin = req.headers.origin;
     if (allowedOrigins.indexOf(origin) > -1) {
        res.header('Access-Control-Allow-Origin', origin);
