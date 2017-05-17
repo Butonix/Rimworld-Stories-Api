@@ -12,7 +12,7 @@ exports.FACEBOOKAUTH = {
         'callbackURL'   : process.env.FB_CALLBACK_URL
     };
 
-exports.CLIENT_URL = 'https://rimworld-stories.netlify.com';
+exports.CLIENT_URL = 'https://www.rimworld-stories.com';
 
 exports.CLOUDINARY_API = {
         'api_key': process.env.CLOUDINARY_API_KEY,
