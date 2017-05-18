@@ -54,6 +54,7 @@ const StorySchema = mongoose.Schema({
     comments: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Comment' }],
     screenshot: { type: String },
     views: { type: Number, default: 0 },
+    starCount: { type: Number, default: 0 },
     stars: { type: Array }
 }, {
     strict: 'throw'

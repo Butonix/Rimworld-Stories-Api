@@ -17,7 +17,7 @@ router.post('/get-list', (req, res) => {
     if (req.body.filters.type === ('Most viewed')) {
         filterType = {'views': -1};
     } else if (req.body.filters.type === ('Most starred')) {
-        filterType = {'stars': -1};
+        filterType = {'starCount': -1};
     } else if (req.body.filters.type === ('Most recent')) {
         filterType = {'datePosted': -1};
     }
@@ -64,7 +64,7 @@ router.post('/get-list', (req, res) => {
 router.post('/star/:storyID', ensureLogin, (req, res) => {
     if (req.body.type === 'star') {
         Story
-            .findByIdAndUpdate(req.params.storyID, { $push: { stars: req.user._id } })
+            .findByIdAndUpdate(req.params.storyID, { $push: { stars: req.user._id }, $inc: { starCount: 1 } })
             .then (() => {
                 return Story
                     .findById(req.params.storyID)
@@ -79,7 +79,7 @@ router.post('/star/:storyID', ensureLogin, (req, res) => {
     }
     if (req.body.type === 'unstar') {
         Story
-            .findByIdAndUpdate(req.params.storyID, { $pullAll: { stars: [req.user._id] } })
+            .findByIdAndUpdate(req.params.storyID, { $pullAll: { stars: [req.user._id] }, $inc: { starCount: -1 } })
             .then (() => {
                 return Story
                     .findById(req.params.storyID)
