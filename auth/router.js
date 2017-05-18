@@ -127,7 +127,7 @@ passport.use(new FacebookStrategy({
     clientID: FACEBOOKAUTH.clientID,
     clientSecret: FACEBOOKAUTH.clientSecret,
     callbackURL: FACEBOOKAUTH.callbackURL,
-    profileFields: ["emails", "displayName", 'photos']
+    profileFields: ["emails", "displayName", 'picture.type(large)']
   },
   function(accessToken, refreshToken, profile, cb) {
     let user;
@@ -149,7 +149,8 @@ passport.use(new FacebookStrategy({
                     token: accessToken
                 }
             })
-            .then(user => cb(null, user));
+            .then(user => cb(null, user))
+            .catch(err => {return cb(null, false, {message: 'Incorrect password'});});
         } else {
             return cb(null, user);
         }

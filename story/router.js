@@ -62,7 +62,6 @@ router.post('/get-list', (req, res) => {
 
 // STAR STORY
 router.post('/star/:storyID', ensureLogin, (req, res) => {
-    console.log(req.body)
     if (req.body.type === 'star') {
         Story
             .findByIdAndUpdate(req.params.storyID, { $push: { stars: req.user._id } })
@@ -160,8 +159,6 @@ router.get('/get-draft/:storyID', ensureLogin, (req, res) => {
         return Story
             .findById(req.params.storyID)
             .then((story) => {
-                console.log(req.user.id)
-                console.log(story.author)
                 if (String(req.user.id) !== String(story.author)) {
                     return res.json({
                         APIerror: 'You are not the author of this story',
