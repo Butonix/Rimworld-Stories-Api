@@ -42,11 +42,11 @@ const app = express();
 app.use((req, res, next) => {
 
     const allowedOrigins = [CLIENT_URL, 'https://www.rimworld-stories.com', 'http://www.rimworld-stories.com'];
+    console.log(CLIENT_URL)
     const origin = req.headers.origin;
     if (allowedOrigins.indexOf(origin) > -1) {
        res.header('Access-Control-Allow-Origin', origin);
    };
-    res.header("Access-Control-Allow-Origin", 'https://www.rimworld-stories.com');
     res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,OPTIONS');
 	res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept, Authorization");
 	res.header("Access-Control-Allow-Credentials", true);
