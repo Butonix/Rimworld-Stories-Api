@@ -36,6 +36,10 @@ router.post('/new-comment', upload.none(), ensureLogin, (req, res) => {
     if (!req.body.comment) {
         return res.json({APIerror: 'Your comment is empty'})
     }
+    if (req.user.id === '591982ed367e8e27383d392f' && req.body.storyAuthor !== '591982ed367e8e27383d392f') {
+        return res.json({APIerror: `You are posting from the Test account. You can only comment on stories posted
+          by this same account. Feel free to create a new story if needed.`})
+    }
     return Comment
         .create({
             author: req.user.id,
