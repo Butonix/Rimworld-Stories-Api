@@ -70,8 +70,18 @@ const CommentSchema = mongoose.Schema({
     strict: 'throw'
 });
 
+// THE BRAIN LEADERBOARD SCHEMA
+const TBScoreSchema = mongoose.Schema({
+    datePosted: { type: Date, default: Date.now },
+    username: { type: String },
+    score: { type: Number }
+}, {
+    strict: 'throw'
+});
+
 const User = mongoose.model('User', UserSchema);
 const Story = mongoose.model('Story', StorySchema);
 const Comment = mongoose.model('Comment', CommentSchema);
+const TBScore = mongoose.model('TBScore', TBScoreSchema);
 
-module.exports = {User, Story, Comment};
+module.exports = {User, Story, Comment, TBScore};

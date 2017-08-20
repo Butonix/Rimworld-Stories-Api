@@ -32,6 +32,7 @@ const {router: authRouter} = require('./auth');
 const {router: profileRouter} = require('./profile');
 const {router: storyRouter} = require('./story');
 const {router: commentRouter} = require('./comment');
+const {router: tbScoresRouter} = require('./tbscore');
 
 let server;
 mongoose.Promise = global.Promise;
@@ -71,6 +72,7 @@ app.use('/auth/', authRouter);
 app.use('/profile/', profileRouter);
 app.use('/story/', storyRouter);
 app.use('/comment/', commentRouter);
+app.use('/tbscore/', tbScoresRouter);
 
 app.use('*', (req, res) => {
     return res.status(404).json({message: '404 - Not Found'});
