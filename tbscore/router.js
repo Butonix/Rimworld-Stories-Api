@@ -8,7 +8,7 @@ router.get('/get', (req, res) => {
     TBScore
         .find()
         .then((scores) => {
-            res.json(scores))
+            res.json(scores)
         })
         .catch(err => {res.json({APIerror: 'Error when fetching scores: ' + err})});
 });
