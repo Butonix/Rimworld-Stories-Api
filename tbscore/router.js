@@ -22,7 +22,7 @@ router.get('/', (req, res) => {
                 .then((scores) => {
                     recentScores = scores;
                     res.json({
-                      theBrain: highScores[0],
+                      theBrain: highScores[0] || {},
                       highScores: highScores.slice(1),
                       recentScores
                     })
@@ -54,7 +54,7 @@ router.post('/', upload.none(), (req, res) => {
                         .then((scores) => {
                             recentScores = scores;
                             res.json({
-                              theBrain: highScores[0],
+                              theBrain: highScores[0] || {},
                               highScores: highScores.slice(1),
                               recentScores
                             })
