@@ -15,7 +15,9 @@ function loadConfig (configPath) {
 
 //Setting up mailer
 const transporter = nodemailer.createTransport(smtpTransport({
-    service: 'gmail',
+    host: 'smtp.gmail.com',
+    port: 587,
+    secure: false,
     auth: {
         user: 'nicoma63@gmail.com',
         pass: MAIL_PASS
