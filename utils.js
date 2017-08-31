@@ -1,7 +1,6 @@
 const fs = require('fs');
 const {User, Story} = require('./config/models');
 const nodemailer = require('nodemailer');
-const smtpTransport = require('nodemailer-smtp-transport');
 
 // Load either local config or regular config
 if (fs.existsSync('./config/local')) {
@@ -14,15 +13,13 @@ function loadConfig (configPath) {
 }
 
 //Setting up mailer
-const transporter = nodemailer.createTransport(smtpTransport({
-    host: 'smtp.gmail.com',
-    port: 587,
-    secure: false,
+const transporter = nodemailer.createTransport({
+    host: 'smtp.mailgun.org',
     auth: {
-        user: 'nicoma63@gmail.com',
+        user: 'postmaster@sandbox82e9d6dc6f374890b03994540b9c6366.mailgun.org',
         pass: MAIL_PASS
     }
-}));
+});
 
 const sendMailAdmin = (message) => {
     let mailOptions = {
