@@ -3,7 +3,7 @@ const passport = require('passport');
 const {User, Story, Comment} = require('../config/models');
 const router = express.Router();
 const fs = require('fs');
-const {ensureLogin} = require('../utils');
+const {ensureLogin, sendMailAdmin} = require('../utils');
 const cloudinary = require('cloudinary');
 const multer  = require('multer');
 const upload = multer({ dest: 'temp-uploads/' });
@@ -280,6 +280,7 @@ router.put('/update', upload.none(), ensureLogin, (req, res) => {
     } else {
         date = Date.now();
         message = 'Story successfully posted';
+        sendMailAdmin(`<h2>A new Story has been published!</h2><p>Title: ${req.body.title}</p>`);
     }
     return Story
         .findOneAndUpdate( {_id: req.body.id},

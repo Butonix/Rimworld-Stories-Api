@@ -1,5 +1,41 @@
 const fs = require('fs');
 const {User, Story} = require('./config/models');
+const nodemailer = require('nodemailer');
+
+// Load either local config or regular config
+if (fs.existsSync('./config/local')) {
+    loadConfig('./config/local/config.js');
+} else {
+    loadConfig('./config/config.js');
+}
+function loadConfig (configPath) {
+    return {MAIL_PASS} = require(configPath);
+}
+
+//Setting up mailer
+const transporter = nodemailer.createTransport({
+    service: 'gmail',
+    auth: {
+        user: 'nicoma63@gmail.com',
+        pass: MAIL_PASS
+    }
+});
+
+const sendMailAdmin = (message) => {
+    let mailOptions = {
+        from: 'nicoma63@gmail.com',
+        to: 'nicoma63@gmail.com',
+        subject: 'Mail from Rimworld Stories backend',
+        html: message
+    };
+    transporter.sendMail(mailOptions, function(error, info){
+        if (error) {
+            console.log(error);
+        } else {
+            console.log('Email sent: ' + info.response);
+        }
+    });
+}
 
 const ensureLogin = (req, res, next) => {
     if (req.user && req.isAuthenticated() && !req.user.banned) {
@@ -33,4 +69,4 @@ const loadUser = (req, res) => {
         })
 }
 
-module.exports = {ensureLogin, loadUser};
+module.exports = {ensureLogin, loadUser, sendMailAdmin};

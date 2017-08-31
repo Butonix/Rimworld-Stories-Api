@@ -6,7 +6,7 @@ const {User, Story} = require('../config/models');
 const router = express.Router();
 const faker = require('faker');
 const fs = require('fs');
-const {ensureLogin, loadUser} = require('../utils');
+const {ensureLogin, loadUser, sendMailAdmin} = require('../utils');
 const multer  = require('multer');
 const upload = multer({ dest: 'temp-uploads/' });
 
@@ -75,6 +75,7 @@ router.post('/signup', upload.none(), (req, res) => {
         });
     })
     .then(user => {
+        sendMailAdmin(`<h2>A new user has registered!</h2><p>Name: ${username}</p>`);
         return res.json({APImessage: 'Account created! You can now log in with your credentials.'});
     })
     .catch(err => {

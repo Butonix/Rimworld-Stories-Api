@@ -4,6 +4,7 @@ const router = express.Router();
 const mongoose = require('mongoose');
 const multer  = require('multer');
 const upload = multer({ dest: 'temp-uploads/' });
+const {sendMailAdmin} = require('../utils');
 
 // GET SCORES
 router.get('/', (req, res) => {
@@ -41,6 +42,7 @@ router.post('/', upload.none(), (req, res) => {
             score: req.body.score || 0
         })
         .then(() => {
+            sendMailAdmin(`<h2>The Brain - New score!</h2><p>${req.body.username} has played The Brain and scored ${req.body.score}!</p>`);
             TBScore
                 .find()
                 .sort({ score: -1 })

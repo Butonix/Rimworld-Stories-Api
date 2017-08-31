@@ -19,3 +19,5 @@ exports.CLOUDINARY_API = {
         'api_secret': process.env.CLOUDINARY_API_SECRET,
         'cloud_name': process.env.CLOUDINARY_CLOUD_NAME
     };
+
+exports.MAIL_PASS = process.env.MAIL_PASS;
