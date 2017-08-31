@@ -1,6 +1,7 @@
 const fs = require('fs');
 const {User, Story} = require('./config/models');
 const nodemailer = require('nodemailer');
+const smtpTransport = require('nodemailer-smtp-transport');
 
 // Load either local config or regular config
 if (fs.existsSync('./config/local')) {
@@ -13,13 +14,13 @@ function loadConfig (configPath) {
 }
 
 //Setting up mailer
-const transporter = nodemailer.createTransport({
+const transporter = nodemailer.createTransport(smtpTransport({
     service: 'gmail',
     auth: {
         user: 'nicoma63@gmail.com',
         pass: MAIL_PASS
     }
-});
+}));
 
 const sendMailAdmin = (message) => {
     let mailOptions = {
